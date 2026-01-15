@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Экзаменатор</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+      width: 100%;
+      max-width: 600px;
+      overflow: hidden;
+    }
+    
+    .header {
+      background: #4361ee;
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 1.8em;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .progress {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 5px;
+      margin-top: 10px;
+      font-size: 0.95em;
+    }
+    
+    .content {
+      padding: 40px;
+    }
+    
+    .question-box {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .question-text {
+      font-size: 1.8em;
+      line-height: 1.4;
+      color: #212529;
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    
+    .hint-box {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      color: #856404;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 25px 0;
+      font-size: 1.1em;
+      line-height: 1.5;
+    }
+    
+    .input-group {
+      margin: 25px 0;
+    }
+    
+    .answer-input {
+      width: 100%;
+      padding: 18px;
+      font-size: 1.2em;
+      border: 2px solid #ced4da;
+      border-radius: 12px;
+      transition: border-color 0.3s;
+    }
+    
+    .answer-input:focus {
+      outline: none;
+      border-color: #4361ee;
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+    }
+    
+    .submit-btn {
+      background: #4361ee;
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 18px;
+      font-size: 1.2em;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+    }
+    
+    .submit-btn:hover {
+      background: #3a56e0;
+      transform: translateY(-2px);
+    }
+    
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+    
+    .error-message {
+      color: #e74c3c;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.1em;
+      margin: 15px 0;
+      animation: shake 0.5s;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    @media (max-width: 600px) {
+      .content {
+        padding: 25px;
+      }
+      
+      .question-text {
+        font-size: 1.4em;
+      }
+      
+      .answer-input {
+        padding: 15px;
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎓 Экзаменатор</h1>
+      <div class="progress">Вопрос {{ question_num }} из {{ total_questions }}</div>
+    </div>
+    
+    <div class="content">
+      <div class="question-box">
+        <!-- Добавь этот блок ПЕРЕД формой -->
+{% if error %}
+  <div class="hint-box">
+    ❌ {{ hint }}
+  </div>
+{% endif %}
+  <div class="question-text">{{ question }}</div>
+  
+  <!-- Текстовые вопросы (старый тип) -->
+  {% if question_type == 'text' or question_type is none %}
+    <form method="POST" action="/check">
+      <div class="input-group">
+        <input type="text" name="answer" class="answer-input" 
+               placeholder="Введите ваш ответ здесь..." required autofocus>
+      </div>
+      
+      <button type="submit" class="submit-btn">
+        Проверить ответ
+      </button>
+    </form>
+  
+  <!-- Вопросы с одним вариантом (A/B/C/D) -->
+  {% elif question_type == 'multiple_choice' %}
+    <form method="POST" action="/check" class="options-form">
+      {% for option in options %}
+        <div class="option-item">
+          <input type="radio" id="option_{{ loop.index0 }}" name="option" 
+                 value="{{ loop.index0 }}" required>
+          <label for="option_{{ loop.index0 }}">
+            {{ loop.index|chr }}) {{ option }}  <!-- A) Лондон, B) Берлин... -->
+          </label>
+        </div>
+      {% endfor %}
+      
+      <button type="submit" class="submit-btn">
+        Выбрать ответ
+      </button>
+    </form>
+  
+  <!-- Вопросы с несколькими вариантами -->
+  {% elif question_type == 'multiple_select' %}
+    <form method="POST" action="/check" class="options-form">
+      {% for option in options %}
+        <div class="option-item">
+          <input type="checkbox" id="option_{{ loop.index0 }}" name="options" 
+                 value="{{ loop.index0 }}">
+          <label for="option_{{ loop.index0 }}">
+            {{ loop.index|chr }}) {{ option }}
+          </label>
+        </div>
+      {% endfor %}
+      
+      <button type="submit" class="submit-btn">
+        Проверить выбор
+      </button>
+    </form>
+  {% endif %}
+</div>
+    </div>
+  </div>
+</body>
+</html>

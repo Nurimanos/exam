@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Результаты экзамена</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+      width: 100%;
+      max-width: 600px;
+      overflow: hidden;
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .celebration {
+      font-size: 5em;
+      margin-bottom: 20px;
+      animation: bounce 1s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    
+    .score-container {
+      margin: 30px 0;
+    }
+    
+    .score {
+      font-size: 6em;
+      font-weight: 800;
+      background: linear-gradient(45deg, #4361ee, #3a0ca3);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1;
+    }
+    
+    .total {
+      font-size: 1.5em;
+      color: #6c757d;
+      margin-top: 10px;
+      font-weight: 500;
+    }
+    
+    .message {
+      font-size: 1.8em;
+      margin: 30px 0;
+      color: #212529;
+      min-height: 60px;
+    }
+    
+    .perfect {
+      color: #28a745;
+    }
+    
+    .good {
+      color: #ffc107;
+    }
+    
+    .bad {
+      color: #dc3545;
+    }
+    
+    .restart-btn {
+      background: #4361ee;
+      color: white;
+      border: none;
+      padding: 18px 40px;
+      font-size: 1.3em;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+      margin-top: 20px;
+    }
+    
+    .restart-btn:hover {
+      background: #3a56e0;
+      transform: scale(1.05);
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 20px;
+      }
+      
+      .score {
+        font-size: 4em;
+      }
+      
+      h1 {
+        font-size: 2em;
+      }
+      
+      .message {
+        font-size: 1.4em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="celebration">🎉</div>
+    <h1>Тест завершен!</h1>
+    
+    <div class="score-container">
+      <div class="score">{{ score }}</div>
+      <div class="total">из {{ total }}</div>
+    </div>
+    
+    <div class="message 
+      {% if score == total %}perfect
+      {% elif score >= total * 0.8 %}good
+      {% else %}bad{% endif %}">
+      {% if score == total %}
+        Отлично! Ты справилась на все 100%!
+      {% elif score >= total * 0.8 %}
+        Великолепно! Почти идеально!
+      {% elif score >= total * 0.6 %}
+        Хорошо! Есть над чем поработать.
+      {% else %}
+        Попробуй еще раз! Ты сможешь лучше.
+      {% endif %}
+    </div>
+    
+    <form method="GET" action="/">
+      <button type="submit" class="restart-btn">Начать заново</button>
+    </form>
+  </div>
+</body>
+</html>
