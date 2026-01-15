@@ -205,4 +205,4 @@ def reset():
 
 if __name__ == '__main__':
     # ВСЕГДА используй debug=False для публичного доступа!
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    app.run(debug=True)
